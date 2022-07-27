@@ -36,6 +36,8 @@ function toggleFinal(){
     } else{
         this.classList.add('completed');
     }
+    // store
+    saveBooks();
 }
 
 // add books
@@ -63,6 +65,8 @@ function loadBooks(){
             let book = listBooks[i];
             readBooks(book.name, book.completed);
         }
+    } else {
+        // tu viet
     }
 }
 

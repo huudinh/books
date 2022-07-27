@@ -6,6 +6,7 @@ ul.addEventListener('click', (e) => {
     if(e.target.className == 'booksList__delete') {
         const li = e.target.parentElement;
         li.parentNode.removeChild(li);
+        saveBooks();
     }
 });
 
@@ -29,14 +30,39 @@ searchBook.addEventListener('keyup', (e) => {
     }
 })
 
+function toggleFinal(){
+    if(this.classList.contains('completed')){
+        this.classList.remove('completed')
+    } else{
+        this.classList.add('completed');
+    }
+}
+
+// add books
+const addForm = forms['booksAdd'];
+addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const input = e.target.querySelector('input').value;
+    if(input == ''){
+        alert('Please enter the book');
+        return;
+    }
+    readBooks(input, false);
+})
+
+loadBooks();
+
 // load books
 function loadBooks(){
-    let listBooks = data;
-    ul.innerHTML = '';
+    if (localStorage.getItem('listBooks') != null) {
+        let listBooks = JSON.parse(localStorage.getItem('listBooks'));
+        ul.innerHTML = '';
 
-    for (let i = 0; i < listBooks.length; i++) {
-        let book = listBooks[i];
-        readBooks(book.name, book.completed)
+        for(let i = 0; i < listBooks.length; i++){
+            let book = listBooks[i];
+            readBooks(book.name, book.completed);
+        }
     }
 }
 
@@ -65,29 +91,26 @@ function readBooks(inputValue, completed) {
 
     li.addEventListener('click', toggleFinal);
 
+    // store
+    saveBooks();
+
     // reset input
     document.querySelector('.booksAdd input').value = '';
 }
 
-function toggleFinal(){
-    if(this.classList.contains('completed')){
-        this.classList.remove('completed')
-    } else{
-        this.classList.add('completed');
+// save Books
+function saveBooks(){
+    let listBooks = [];
+
+    const li = ul.querySelectorAll('li');
+    for (let i = 0; i < li.length; i++){
+        const span = li[i].querySelector('.booksList__name');
+        let bookInfo = {
+            'name' : span.textContent,
+            'completed' : li[i].classList.contains('completed')
+        }
+        listBooks.push(bookInfo);
     }
+
+    localStorage.setItem('listBooks', JSON.stringify(listBooks));
 }
-
-// add books
-const addForm = forms['booksAdd'];
-addForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const input = e.target.querySelector('input').value;
-    if(input == ''){
-        alert('Please enter the book');
-        return;
-    }
-    readBooks(input, false);
-})
-
-loadBooks();
